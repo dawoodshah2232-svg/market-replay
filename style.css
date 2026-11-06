@@ -1,0 +1,53 @@
+:root{--bg:#0b0e14;--panel:#12161f;--panel2:#171c28;--line:#232a3a;--txt:#e8ecf3;--mut:#8b94a7;--green:#22c55e;--red:#ef4444;--blue:#3b82f6;--gold:#f5b942;--radius:14px}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif}
+body{max-width:980px;margin:0 auto;padding:0 10px 90px}
+button{font-family:inherit;cursor:pointer;border:0}
+button:active{transform:scale(.97)}
+input,select{font-family:inherit;background:#0d1119;color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:9px 10px;font-size:15px}
+label{font-size:12px;color:var(--mut);display:block;margin-bottom:4px}
+.top{position:sticky;top:0;z-index:20;background:rgba(11,14,20,.92);backdrop-filter:blur(12px);padding:10px 2px 8px;border-bottom:1px solid var(--line)}
+.top h1{font-size:19px;margin:0;letter-spacing:-.3px}
+.top h1 span{color:var(--gold)}
+.top p{margin:2px 0 0;color:var(--mut);font-size:12px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:12px;margin-top:10px}
+.card h2{font-size:14px;margin:0 0 10px}
+.mut{color:var(--mut);font-size:12px;line-height:1.5}
+.pill{display:inline-block;padding:3px 8px;border-radius:999px;background:#1e2535;font-size:11px;color:var(--mut)}
+.pill.live{color:#7ee2a8;background:rgba(34,197,94,.14)}
+select{flex:1;min-width:0}
+.chip{padding:8px 10px;border-radius:10px;background:#1a2030;border:1px solid var(--line);color:var(--txt);font-size:13px}
+.chip.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.ohlc{display:flex;gap:12px;flex-wrap:wrap;font-size:13px;margin:6px 0}
+.ohlc b{font-variant-numeric:tabular-nums}
+.up{color:var(--green)} .down{color:var(--red)}
+#chartWrap{position:relative;background:#0d1119;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+#chart{width:100%;height:340px;display:block;touch-action:none}
+#priceTag{position:absolute;right:6px;top:8px;background:rgba(0,0,0,.55);padding:4px 8px;border-radius:8px;font-size:13px;font-weight:700}
+#replayTag{position:absolute;left:6px;top:8px;background:rgba(245,185,66,.16);color:var(--gold);padding:4px 8px;border-radius:8px;font-size:11px;font-weight:700}
+.bigplay{width:56px;height:56px;border-radius:50%;background:var(--gold);color:#111;font-size:22px;font-weight:800}
+.ctl{width:44px;height:44px;border-radius:12px;background:#1a2030;border:1px solid var(--line);color:var(--txt);font-size:17px}
+input[type=range]{width:100%;accent-color:var(--gold)}
+.buy{flex:1;background:var(--green);color:#04140a;font-weight:800;font-size:17px;padding:15px;border-radius:12px}
+.sell{flex:1;background:var(--red);color:#fff;font-weight:800;font-size:17px;padding:15px;border-radius:12px}
+.pos{border:1px solid var(--line);border-radius:12px;padding:10px;margin-top:8px;background:var(--panel2)}
+.pos .r{display:flex;justify-content:space-between;gap:8px;font-size:13px;padding:2px 0}
+.pos .r b{font-variant-numeric:tabular-nums}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{padding:7px 4px;border-bottom:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums}
+th:first-child,td:first-child{text-align:left}
+.tabs{display:flex;gap:6px;margin-top:10px}
+.tab{flex:1;padding:10px;border-radius:10px;background:#1a2030;border:1px solid var(--line);color:var(--mut);font-size:13px}
+.tab.on{background:#fff;color:#111;font-weight:700}
+.statgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.stat{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px}
+.stat small{color:var(--mut);font-size:11px;display:block}
+.stat b{font-size:16px;font-variant-numeric:tabular-nums}
+.kbd{font-size:11px;color:var(--mut)}
+.hidden{display:none!important}
+.progress{height:8px;background:#1a2030;border-radius:99px;overflow:hidden}
+.progress i{display:block;height:100%;background:var(--gold);width:0%}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#fff;color:#111;padding:10px 16px;border-radius:99px;font-size:13px;font-weight:700;z-index:99;box-shadow:0 8px 30px rgba(0,0,0,.4)}
+@media(min-width:700px){#chart{height:420px}body{padding-bottom:40px}}

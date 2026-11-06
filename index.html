@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ReplayTrader — Market Replay & Practice Trading</title>
+<meta name="description" content="Rewind any chart, hide the future, press Play and practise trading on real historical candles — XAUUSD, BTCUSD, EURUSD, GBPUSD. Works on your phone, no MT5 Manager needed.">
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0b0e14">
+<link rel="stylesheet" href="style.css">
+</head><body>
+<header class="top">
+  <h1>▶ Replay<span>Trader</span></h1>
+  <p>Rewind the market. Hide the future. Practise like it's live. &nbsp;·&nbsp; <span class="pill live" id="dataBadge">Loading real data…</span></p>
+  <div class="row" style="margin-top:10px">
+    <select id="symbol" aria-label="Symbol"></select>
+    <select id="tf" aria-label="Timeframe">
+      <option value="M15">M15</option><option value="M30">M30</option>
+      <option value="H1" selected>H1</option><option value="H4">H4</option>
+      <option value="D1">Daily</option><option value="W1">Weekly</option>
+    </select>
+    <button class="chip" id="btnSettings">⚙ Settings</button>
+  </div>
+</header>
+
+<section class="card">
+  <div class="row" style="justify-content:space-between">
+    <div><b id="chartTitle">XAUUSD · H1</b><div class="mut" id="chartDate">—</div></div>
+    <div class="row"><button class="chip" id="btnZoomOut">−</button><button class="chip" id="btnZoomIn">+</button>
+    <button class="chip" id="btnSMA">SMA 20/50</button></div>
+  </div>
+  <div class="ohlc" id="ohlc">O — &nbsp; H — &nbsp; L — &nbsp; C —</div>
+  <div id="chartWrap"><canvas id="chart"></canvas><div id="priceTag">—</div><div id="replayTag">REPLAY PAUSED</div></div>
+  <div class="row" style="margin-top:8px;justify-content:space-between"><span class="mut" id="sessionInfo">No session yet — pick a start point below.</span><span class="mut" id="equityLine">Balance — · Equity —</span></div>
+  <div class="progress" style="margin-top:8px"><i id="progBar"></i></div>
+</section>
+
+<section class="card">
+  <h2>1 · Choose where the replay starts</h2>
+  <div class="tabs" style="margin:0 0 10px">
+    <button class="tab on" data-mode="ago">Candles ago</button>
+    <button class="tab" data-mode="date">Pick a date</button>
+    <button class="tab" data-mode="random">🎲 Random</button>
+  </div>
+  <div id="modeAgo">
+    <div class="row">
+      <button class="chip" data-ago="5">5 candles</button><button class="chip" data-ago="10">10</button>
+      <button class="chip" data-ago="20">20</button><button class="chip" data-ago="50">50</button>
+      <button class="chip" data-ago="100">100</button><button class="chip" data-ago="200">200</button>
+    </div>
+    <label style="margin-top:10px">Or type candles ago</label>
+    <input id="agoInput" type="number" value="20" min="2" max="500" style="width:120px">
+  </div>
+  <div id="modeDate" class="hidden">
+    <label>Start date &amp; time (chart time)</label>
+    <input id="dateInput" type="datetime-local" style="width:100%">
+    <p class="mut">The replay starts at the first candle on or after this time. Everything after it is hidden until you press Play.</p>
+  </div>
+  <div id="modeRandom" class="hidden"><p class="mut">Random picks a start at least 30 candles before the end, so you always have a real session to play. Best for blind practice — you won't know the date in advance.</p></div>
+  <div class="row" style="margin-top:12px">
+    <button class="chip" id="btnSetStart" style="flex:1;padding:12px;background:#f5b942;color:#111;font-weight:800">⏪ Set start &amp; hide future</button>
+    <button class="chip" id="btnReveal">Reveal all</button>
+  </div>
+  <p class="mut" id="startInfo"></p>
+</section>
+
+<section class="card">
+  <h2>2 · Replay controls</h2>
+  <div class="row" style="justify-content:center">
+    <button class="ctl" id="btnBack" title="Back 1 candle">⏮</button>
+    <button class="ctl" id="btnStepBack" title="Step back">‹</button>
+    <button class="bigplay" id="btnPlay">▶</button>
+    <button class="ctl" id="btnStep" title="Step forward 1 candle">›</button>
+    <button class="ctl" id="btnEnd" title="Jump to end">⏭</button>
+  </div>
+  <label style="margin-top:12px">Speed — <b id="speedLabel">1 candle / 1.0s</b></label>
+  <input type="range" id="speed" min="0" max="6" step="1" value="2">
+  <div class="row" style="justify-content:space-between"><span class="kbd">Slow — 4s / candle</span><span class="kbd">Fast — 0.06s / candle</span></div>
+  <div class="row" style="margin-top:8px">
+    <button class="chip" id="btnTick">Tick mode: <b id="tickLabel">ON — smooth</b></button>
+    <button class="chip" id="btnRestart">↺ Restart session</button>
+  </div>
+  <p class="mut">Tick mode animates inside each candle (open → high/low → close in 10 steps), so Stop Loss / Take Profit can trigger mid-candle — just like live. Turn it off to jump candle-to-candle.</p>
+</section>
+
+<section class="card">
+  <h2>3 · Practise trading <span class="pill">SIMULATED — no real money</span></h2>
+  <div class="row2">
+    <div><label>Lot size</label><div class="row"><button class="chip" id="lotMinus">−</button><input id="lot" type="number" value="0.10" step="0.01" min="0.01" style="flex:1;text-align:center"><button class="chip" id="lotPlus">+</button></div></div>
+    <div><label>Risk per trade</label><select id="riskPct"><option value="0.5">0.5% — safe</option><option value="1" selected>1%</option><option value="2">2%</option><option value="0">Fixed lot (no auto-size)</option></select></div>
+  </div>
+  <div class="row2" style="margin-top:8px">
+    <div><label>Stop Loss (points)</label><input id="slPts" type="number" value="50" min="0" style="width:100%"></div>
+    <div><label>Take Profit (points)</label><input id="tpPts" type="number" value="100" min="0" style="width:100%"></div>
+  </div>
+  <div class="row" style="margin-top:8px">
+    <button class="chip" data-rr="1">RR 1:1</button><button class="chip" data-rr="2">RR 1:2</button><button class="chip" data-rr="3">RR 1:3</button>
+    <span class="mut" id="rrInfo">SL 50 · TP 100</span>
+  </div>
+  <div class="row" style="margin-top:12px"><button class="buy" id="btnBuy">▲ BUY</button><button class="sell" id="btnSell">▼ SELL</button></div>
+  <div class="row" style="margin-top:8px">
+    <select id="pendType"><option value="">Pending order…</option><option value="buylimit">Buy Limit</option><option value="selllimit">Sell Limit</option><option value="buystop">Buy Stop</option><option value="sellstop">Sell Stop</option></select>
+    <input id="pendPrice" type="number" step="any" placeholder="Trigger price" style="flex:1">
+    <button class="chip" id="btnPend">Place</button>
+  </div>
+  <p class="mut">Buy/Sell opens at the current replay price. SL/TP are in points (for XAUUSD 1 point = $0.10, for BTCUSD 1 point = $1, for EUR/GBP 1 point = 0.0001). Spread is simulated — see Settings. Positions close automatically on SL/TP, or tap Close below.</p>
+  <div id="positions"></div>
+  <div class="row" style="margin-top:8px"><button class="chip" id="btnCloseAll">Close all positions</button><button class="chip" id="btnBE">Move all SL to breakeven</button></div>
+</section>
+
+<section class="card">
+  <h2>Results</h2>
+  <div class="statgrid" id="stats">
+    <div class="stat"><small>Balance</small><b id="stBal">—</b></div>
+    <div class="stat"><small>Equity</small><b id="stEq">—</b></div>
+    <div class="stat"><small>Floating P/L</small><b id="stFloat">—</b></div>
+    <div class="stat"><small>Trades</small><b id="stTrades">0</b></div>
+    <div class="stat"><small>Win rate</small><b id="stWin">—</b></div>
+    <div class="stat"><small>Profit factor</small><b id="stPF">—</b></div>
+    <div class="stat"><small>Total P/L</small><b id="stPL">—</b></div>
+    <div class="stat"><small>Max drawdown</small><b id="stDD">—</b></div>
+    <div class="stat"><small>Expectancy / trade</small><b id="stExp">—</b></div>
+  </div>
+  <div class="tabs"><button class="tab on" data-tab="hist">Trade history</button><button class="tab" data-tab="journal">Session notes</button><button class="tab" data-tab="challenge">Challenge</button></div>
+  <div id="tab-hist"><div id="history"><p class="mut">No closed trades yet in this session.</p></div>
+  <div class="row" style="margin-top:8px"><button class="chip" id="btnCSV">⬇ Export trades (CSV)</button><button class="chip" id="btnSave">💾 Save session</button><button class="chip" id="btnLoad">📂 Load saved</button></div></div>
+  <div id="tab-journal" class="hidden"><label>What did you learn in this session?</label><textarea id="journal" rows="4" style="width:100%;background:#0d1119;color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:10px" placeholder="Entry rule I followed… mistake I made…"></textarea><button class="chip" id="btnJournal" style="margin-top:8px">Save note with session</button></div>
+  <div id="tab-challenge" class="hidden"><p class="mut"><b style="color:var(--txt)">Prop-firm style challenge (optional)</b><br>Target +10% · Max drawdown 5% · No daily-loss rule in this version. Turn it on, then trade the replay — the panel tells you PASS / FAIL live.</p>
+  <button class="chip" id="btnChallenge">Start challenge: +10% target</button><p class="mut" id="challengeInfo"></p></div>
+</section>
+
+<section class="card" id="settingsCard" hidden>
+  <h2>Settings</h2>
+  <div class="row2">
+    <div><label>Starting balance ($)</label><input id="startBal" type="number" value="10000" style="width:100%"></div>
+    <div><label>Spread (points)</label><input id="spreadPts" type="number" value="2" min="0" style="width:100%"></div>
+  </div>
+  <div class="row" style="margin-top:10px"><button class="chip" id="btnApplySettings" style="flex:1;padding:11px;background:#fff;color:#111;font-weight:800">Apply &amp; reset account</button></div>
+  <p class="mut">Contract specs are per symbol (see README in the repo): XAUUSD $100/oz per 1.00 lot, BTCUSD $1 per $1 move per 1.00 lot, EUR/GBP $100,000 per 1.00 lot. Changing balance resets open trades and history for the current session.</p>
+</section>
+
+<section class="card"><h2>How this works — and MT5</h2>
+<p class="mut">MT5 on your phone has <b style="color:var(--txt)">no built-in market replay</b>. Paid replay tools on MQL5 only run on MT5 Desktop (Windows). MT5 Manager access is broker-only — MetaQuotes licences it to the company running the MT5 server, a retail trader cannot get it, and replay doesn't need it anyway: replay is a client-side simulation.<br><br>
+This app is the phone solution: it loads <b style="color:var(--txt)">real historical candles</b> (bundled in the repo, refreshed from Kraken for crypto and Yahoo Finance for gold/FX), hides everything after your start point, and replays them tick-by-tick while you trade with simulated money. No broker, no login, no Manager access. Add it to your Home Screen from your browser menu and it works like an app, offline.</p>
+<p class="mut">Full explanation + MT5 desktop options: <b style="color:var(--txt)">MT5-EXPLAINED.md</b> in the repo.</p></section>
+
+<footer class="mut" style="text-align:center;padding:18px 0">ReplayTrader · Simulated practice only — not financial advice. Past replay results do not predict live results.</footer>
+<script src="app.js"></script>
+</body></html>
